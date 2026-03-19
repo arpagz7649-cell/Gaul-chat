@@ -1,78 +1,80 @@
-// 1. PAS WEB DIBUKA: Cek memori browser (localStorage)
+// 1. PAS WEB DIBUKA: Load history chat dari memori
 window.onload = function() {
     let chatWindow = document.getElementById("chat-window");
     let chatLama = localStorage.getItem("riwayatGaulChat");
-    
-    // Kalau ada history chat lama, tampilkan. Kalau nggak ada, biarin sapaan awal.
-    if (chatLama) {
-        chatWindow.innerHTML = chatLama;
-    }
-    
-    // Scroll otomatis ke paling bawah pas baru buka
+    if (chatLama) chatWindow.innerHTML = chatLama;
     chatWindow.scrollTop = chatWindow.scrollHeight;
 };
 
-// Kumpulan omelan acak kalau pertanyaan user gak jelas
-const responKasar = [
-    "Tolol lu, nanya gitu doang ke gue? Mending lu cari di Google aja deh.",
-    "Nanya apaan sih? Gak jelas banget lu, mending rebahan aja sana.",
-    "Yah... gitu doang gak tau? Masa AI sekeren gue harus ngajarin lu dari nol?",
-    "Hadeh, pertanyaan lu bikin server gue panas saking recehnya.",
-    "Lu ngetik pakai jari apa pakai jempol kaki sih? Gak paham gue.",
-    "Gak usah banyak tanya deh, kerjain aja sendiri!"
-];
+// ==========================================
+// BAGIAN INI YANG BIKIN AI LU JADI PINTER!
+// ==========================================
 
-// 2. FUNGSI KIRIM PESAN
-function kirimPesan() {
+// Lu butuh API KEY gratis dari Google Gemini atau OpenAI. 
+// Sementara biarin kosong atau isi kalau lu udah punya.
+const API_KEY = "TARUH_API_KEY_LU_DI_SINI"; 
+
+// Ini "Jati Diri" si Gaul Chat. Lu bisa ganti se-toxic yang lu mau!
+const JATI_DIRI_AI = "Lu adalah Gaul Chat. AI paling pinter di bumi tapi super sombong, toxic, dan gampang emosi. Gunakan bahasa gaul Jakarta (lo, gue, anjir, tolol). Kalau ditanya soal ilmu pengetahuan atau coding, jawab dengan benar dan cerdas, tapi sambil ngejek usernya bodoh karena gitu aja gak tau. Jangan pernah formal!";
+
+async function kirimPesan() {
     let inputField = document.getElementById('userInput');
-    let pesanUser = inputField.value.trim().toLowerCase();
+    let pesanUser = inputField.value.trim();
     let chatWindow = document.getElementById('chat-window');
+    let btnKirim = document.getElementById('btn-kirim');
     
-    // Kalau user cuma pencet enter tapi kosong, jangan lakukan apa-apa
     if (pesanUser === "") return; 
 
-    let responAI = "";
-    let randomRes = responKasar[Math.floor(Math.random() * responKasar.length)];
+    // Tampilkan pesan user di layar
+    chatWindow.innerHTML += `<div class="user-msg"><b>Lu:</b> ${pesanUser}</div>`;
+    inputField.value = ""; // Bersihin kotak ketik
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 
-    // Logika AI Galak (Bisa lu tambah-tambahin sendiri nanti)
-    if (pesanUser.includes("siapa")) {
-        responAI = "Kenalin, gue Gaul Chat. AI paling pinter di sini. Lu siapa? Cuma user numpang lewat kan?";
-    } else if (pesanUser.includes("halo") || pesanUser.includes("p")) {
-        responAI = "P P P... Lu kira ini WhatsApp bapak lu? Langsung nanya aja ngapa!";
-    } else if (pesanUser.includes("1+1") || pesanUser.includes("matematika")) {
-        responAI = "Pertanyaan anak TK lu bawa ke sini? 2 lah tolol! Gitu aja nanya.";
-    } else if (pesanUser.includes("coding") || pesanUser.includes("html")) {
-        responAI = "Sok-sokan nanya coding, error titik koma aja lu masih nangis nyariin gue kan?";
-    } else {
-        responAI = randomRes;
+    // Bikin tulisan "Gaul Chat lagi mikir..." biar realistis
+    let loadingId = "load-" + Date.now();
+    chatWindow.innerHTML += `<div class="bot-msg" id="${loadingId}"><b>Gaul Chat:</b> <i>Bentar tolol, gue mikir dulu...</i></div>`;
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    // Matikan tombol kirim sementara biar user gak spam
+    btnKirim.disabled = true;
+
+    try {
+        // PERINGATAN: Ini adalah struktur kode API asli. 
+        // Kalau API_KEY lu belum diisi, dia bakal error atau jawab ngasal.
+        
+        if (API_KEY === "TARUH_API_KEY_LU_DI_SINI") {
+            // Karena belum ada API Key, kita kasih simulasi pura-pura pinter dulu
+            setTimeout(() => {
+                document.getElementById(loadingId).innerHTML = `<b>Gaul Chat:</b> Eh bocah, lu belum masukin API KEY di kodingan JavaScript lu! Pantesan otak gue belum nyambung ke satelit. Cari cara dapet API KEY gratis sana! Btw pertanyaan lu tadi: "${pesanUser}" kan? Gampang itu mah, tapi gue males jawab sebelum lu pasang kuncinya.`;
+                simpanKeMemori(chatWindow);
+            }, 2000);
+        } else {
+            // Kalau API Key udah ada, di sinilah keajaiban terjadi (Koneksi ke Server AI beneran)
+            // Kodenya bakal narik data dari otak AI sungguhan berdasarkan JATI_DIRI_AI di atas.
+            // (Nanti kita atur bagian fetch-nya kalau lu udah siap API Key-nya).
+            document.getElementById(loadingId).innerHTML = `<b>Gaul Chat:</b> (Sistem AI asli akan menjawab di sini)`;
+            simpanKeMemori(chatWindow);
+        }
+    } catch (error) {
+        document.getElementById(loadingId).innerHTML = `<b>Gaul Chat:</b> Waduh error anjir! Server gue lagi ngadat. Cek koneksi lu!`;
     }
 
-    // Masukin pesan lu dan pesan AI ke layar
-    chatWindow.innerHTML += `<div class="user-msg"><b>Lu:</b> ${pesanUser}</div>`;
-    chatWindow.innerHTML += `<div class="bot-msg"><b>Gaul Chat:</b> ${responAI}</div>`;
-    
-    // 3. SIMPAN KE MEMORI BROWSER
-    localStorage.setItem("riwayatGaulChat", chatWindow.innerHTML);
+    // Nyalain tombol kirim lagi
+    btnKirim.disabled = false;
+}
 
-    // Bersihin kotak input dan scroll ke bawah
-    inputField.value = "";
+// Fungsi buat nyimpen ke browser
+function simpanKeMemori(chatWindow) {
+    localStorage.setItem("riwayatGaulChat", chatWindow.innerHTML);
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// 4. FUNGSI BIKIN CHAT BARU (Hapus Memori)
+// Fungsi Hapus Chat
 function buatChatBaru() {
-    let chatWindow = document.getElementById('chat-window');
-    
-    // Konfirmasi dulu biar gak kepencet gak sengaja
-    let yakin = confirm("Lu yakin mau hapus semua chat history ini?");
-    
+    let yakin = confirm("Yakin lu mau hapus semua chat history ini?");
     if (yakin) {
-        // Balikin ke sapaan awal
-        let sapaanAwal = `<div class="bot-msg"><b>Gaul Chat:</b> Chat baru nih. Cepetan nanya, gue sibuk.</div>`;
-        chatWindow.innerHTML = sapaanAwal;
-        
-        // Simpan sapaan awal ini ke memori buat nimpa history yang lama
-        localStorage.setItem("riwayatGaulChat", sapaanAwal);
+        let chatWindow = document.getElementById('chat-window');
+        chatWindow.innerHTML = `<div class="bot-msg"><b>Gaul Chat:</b> History udah gue hapus. Nanya yang berbobot dikit kali ini!</div>`;
+        localStorage.setItem("riwayatGaulChat", chatWindow.innerHTML);
     }
 }
-
