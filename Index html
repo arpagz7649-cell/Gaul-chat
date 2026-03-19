@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaul Chat - AI Paling Nyolot</title>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>😎 GAUL CHAT</h1>
+            <p>AI yang jawabnya gak pakai filter.</p>
+            
+            <button id="btn-new-chat" onclick="buatChatBaru()">+ Percakapan Baru</button>
+        </header>
+
+        <main id="chat-window">
+            <div class="bot-msg">
+                <b>Gaul Chat:</b> Woi! Udah masuk sini mau nanya apa lu? Cepetan ngetik, gue sibuk.
+            </div>
+        </main>
+
+        <footer>
+            <input type="text" id="userInput" placeholder="Ketik pertanyaan lu di sini..." onkeydown="if(event.key === 'Enter') kirimPesan()">
+            <button id="btn-kirim" onclick="kirimPesan()">Kirim</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
+
